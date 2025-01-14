@@ -1,9 +1,10 @@
 import torch
 import ollama
 import os
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 import argparse
 import json
+
 
 # ANSI escape codes for colors
 PINK = '\033[95m'
@@ -97,27 +98,29 @@ def ollama_chat(user_input, system_message, vault_embeddings, vault_content, oll
         *conversation_history
     ]
     
-    response = client.chat.completions.create(
-        model=ollama_model,
-        messages=messages,
-        max_tokens=2000,
-    )
-    
-    conversation_history.append({"role": "assistant", "content": response.choices[0].message.content})
-    
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model=ollama_model,
+            messages=messages,
+            max_tokens=2000,
+        )
+        conversation_history.append({"role": "assistant", "content": response.choices[0].message.content})
+        return response.choices[0].message.content
+    except OpenAIError as e:
+        print("An error occurred:", e)
+        return "An error occurred during the conversation."
 
 # Parse command-line arguments
 print(NEON_GREEN + "Parsing command-line arguments..." + RESET_COLOR)
 parser = argparse.ArgumentParser(description="Ollama Chat")
-parser.add_argument("--model", default="llama3", help="Ollama model to use (default: llama3)")
+parser.add_argument("--model", default="llama3.2:1b", help="Ollama model to use (default:llama3.2:1b)")
 args = parser.parse_args()
 
 # Configuration for the Ollama API client
 print(NEON_GREEN + "Initializing Ollama API client..." + RESET_COLOR)
 client = OpenAI(
     base_url='http://localhost:11434/v1',
-    api_key='llama3'
+    api_key='llama3.2:1'
 )
 
 # Load the vault content

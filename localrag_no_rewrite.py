@@ -1,7 +1,7 @@
 import torch
 import ollama
 import os
-from openai import OpenAI
+from openai import OpenAI,OpenAIError
 import argparse
 
 # ANSI escape codes for colors
@@ -71,13 +71,13 @@ def ollama_chat(user_input, system_message, vault_embeddings, vault_content, oll
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Ollama Chat")
-parser.add_argument("--model", default="dolphin-llama3", help="Ollama model to use (default: llama3)")
+parser.add_argument("--model", default="llama3.2:1b", help="Ollama model to use (dllama3.2:1b)")
 args = parser.parse_args()
 
 # Configuration for the Ollama API client
 client = OpenAI(
     base_url='http://localhost:11434/v1',
-    api_key='dolphin-llama3'
+    api_key=':llama3.2:1b'
 )
 
 # Load the vault content
